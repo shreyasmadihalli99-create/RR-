@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Raghavendra Vaibhav - Menu</title>
+    <style>
+        :root {
+            --primary: #d32f2f;
+            --accent: #ff9800;
+            --bg: #fffbf5;
+            --text: #333;
+            --white: #ffffff;
+            --gray: #f4f4f4;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        #hero-page {
+            height: 100vh;
+            width: 100%;
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
+                        url('https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=1500&q=80');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 3000;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #hero-page.hidden { transform: translateY(-100%); }
+
+        .explore-btn {
+            margin-top: 25px;
+            background: var(--accent);
+            color: white;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 152, 0, 0.4);
+        }
+
+        #menu-page {
+            display: none;
+            max-width: 900px;
+            margin: 0 auto;
+            padding-bottom: 500px;
+        }
+
+        .tabs-container {
+            position: sticky;
+            top: 0;
+            background: var(--white);
+            display: flex;
+            overflow-x: auto;
+            padding: 15px;
+            gap: 10px;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .tab-btn {
+            background: var(--gray);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            white-space: nowrap;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .menu-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--white);
+            padding: 15px;
+            margin: 10px;
+            border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .qty-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--gray);
+            padding: 5px 8px;
+            border-radius: 20px;
+        }
+
+        .qty-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .cart-popup {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%) translateY(100%);
+            width: 100%;
+            max-width: 500px;
+            background: var(--white);
+            box-shadow: 0 -5px 25px rgba(0,0,0,0.2);
+            border-top-left-radius: 25px;
+            border-top-right-radius: 25px;
+            padding: 20px;
+            transition: transform 0.4s ease;
+            z-index: 4000;
+            box-sizing: border-box;
+        }
+
+        .cart-popup.active { transform: translateX(-50%) translateY(0); }
+
+        .delivery-input {
+            width: 100%; padding: 12px; margin-bottom: 10px; 
+            border: 1.5px solid #eee; border-radius: 10px;
+            box-sizing: border-box;
+        }
+
+        .loc-btn {
+            background: #2196F3; color: white; border: none; padding: 12px;
+            width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; margin-bottom: 15px;
+        }
+
+        .loc-btn.verified { background: #2e7d32; }
+
+        .checkout-btn {
+            background: #2e7d32; color: white; border: none;
+            padding: 15px; width: 100%; border-radius: 12px;
+            font-weight: bold; font-size: 1.1rem; cursor: pointer;
+            display: none; 
+        }
+    </style>
+</head>
+<body>
+
+    <section id="hero-page">
+        <h1>Hotel Raghavendra Vaibhav</h1>
+        <p>Authentic Udupi Taste</p>
+        <button class="explore-btn" onclick="openMenu()">Explore Menu</button>
+    </section>
+
+    <main id="menu-page">
+        <div class="tabs-container" id="tabs"></div>
+
+        <div style="padding: 15px;">
+            <img id="category-image" style="width:100%; height:200px; object-fit:cover; border-radius:15px;" src="https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=500">
+            <h2 id="current-category-name" style="color:var(--primary); margin-top:15px;">Drinks & Breakfast</h2>
+            <div id="menu-items-container"></div>
+        </div>
+
+        <div class="cart-popup" id="cart-popup">
+            <div style="font-weight:bold; margin-bottom: 10px;">Order Details</div>
+            
+            <input type="text" id="cust-name" class="delivery-input" placeholder="Your Name">
+            <input type="tel" id="cust-phone" class="delivery-input" placeholder="10-Digit Phone" maxlength="10">
+
+            <button class="loc-btn" id="loc-btn" onclick="getLocation()">📍 Step 1: Share Live Location</button>
+            
+            <div id="cart-items-container" style="max-height: 100px; overflow-y: auto; font-size: 0.9rem; margin-bottom:10px;"></div>
+
+            <div style="display:flex; justify-content:space-between; font-weight:bold; color:var(--primary); margin-bottom: 10px;">
+                <span>Total (Inc. Fees)</span>
+                <span>₹<span id="cart-grand-total">0</span></span>
+            </div>
+            
+            <button id="submit-btn" class="checkout-btn" onclick="submitOrder()">Step 2: Place Order Now</button>
+        </div>
+    </main>
+
+<script>
+    let userLocationURL = "";
+    let cart = {};
+
+    const menu = {
+        "Drinks & Breakfast": [{name: "Tea", price: 15}, {name: "Coffee", price: 25}, {name: "Idli", price: 35}, {name: "Vada", price: 50}],
+        "Soups & Starters": [{name: "Gobi Manchurian", price: 80}, {name: "Paneer Chilli", price: 150}],
+        "Veg Main Course": [{name: "Dal Fry", price: 90}, {name: "Veg Kolhapuri", price: 130}]
+    };
+
+    function openMenu() {
+        document.getElementById('hero-page').classList.add('hidden');
+        setTimeout(() => {
+            document.getElementById('hero-page').style.display = 'none';
+            document.getElementById('menu-page').style.display = 'block';
+        }, 600);
+    }
+
+    function renderTabs() {
+        const container = document.getElementById('tabs');
+        Object.keys(menu).forEach((cat, i) => {
+            const btn = document.createElement('button');
+            btn.className = `tab-btn ${i === 0 ? 'active' : ''}`;
+            btn.innerText = cat;
+            btn.onclick = () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById('current-category-name').innerText = cat;
+                renderItems(cat);
+            };
+            container.appendChild(btn);
+        });
+    }
+
+    function renderItems(cat) {
+        const container = document.getElementById('menu-items-container');
+        container.innerHTML = '';
+        menu[cat].forEach(item => {
+            const qty = cart[item.name] ? cart[item.name].qty : 0;
+            const div = document.createElement('div');
+            div.className = 'menu-item';
+            div.innerHTML = `
+                <span>${item.name} - ₹${item.price}</span>
+                <div class="qty-box">
+                    <button class="qty-btn" onclick="updateCart('${item.name}', ${item.price}, -1)">-</button>
+                    <span>${qty}</span>
+                    <button class="qty-btn" onclick="updateCart('${item.name}', ${item.price}, 1)">+</button>
+                </div>`;
+            container.appendChild(div);
+        });
+    }
+
+    function updateCart(name, price, change) {
+        if(!cart[name]) cart[name] = {qty: 0, price: price};
+        cart[name].qty += change;
+        if(cart[name].qty < 0) cart[name].qty = 0;
+        calculateTotal();
+        renderItems(document.getElementById('current-category-name').innerText);
+    }
+
+    function calculateTotal() {
+        let subtotal = 0;
+        let html = "";
+        let count = 0;
+        for(let key in cart) {
+            if(cart[key].qty > 0) {
+                subtotal += (cart[key].qty * cart[key].price);
+                html += `<div>${key} x ${cart[key].qty}</div>`;
+                count++;
+            }
+        }
+        document.getElementById('cart-items-container').innerHTML = html;
+        document.getElementById('cart-grand-total').innerText = subtotal > 0 ? subtotal + 15 : 0;
+        document.getElementById('cart-popup').classList.toggle('active', count > 0);
+    }
+
+    function getLocation() {
+        if (navigator.geolocation) {
+            document.getElementById('loc-btn').innerText = "🛰️ Locating...";
+            navigator.geolocation.getCurrentPosition((pos) => {
+                userLocationURL = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
+                document.getElementById('loc-btn').innerText = "✅ Location Saved";
+                document.getElementById('loc-btn').classList.add('verified');
+                document.getElementById('submit-btn').style.display = 'block';
+            });
+        }
+    }
+
+    async function submitOrder() {
+        const name = document.getElementById('cust-name').value;
+        const phone = document.getElementById('cust-phone').value;
+        const total = document.getElementById('cart-grand-total').innerText;
+
+        if(!name || phone.length < 10) return alert("Enter Name & Phone");
+
+        let items = "";
+        for(let key in cart) if(cart[key].qty > 0) items += `${key}(${cart[key].qty}), `;
+
+        // THE SILENT SUBMISSION
+        const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfYGXB2Lim7wtiFCYy8U7MtV9DN9X2Tm7zSkx-qYxPLSLRcUg/formResponse";
+        
+        const formData = new URLSearchParams();
+        formData.append("entry.164020655", "Raghavendra Vaibhav"); // HOTEL
+        formData.append("entry.248975380", "₹" + total);           // TOTAL (Locked by code)
+        formData.append("entry.1304197339", `NAME: ${name} | PH: ${phone} | ITEMS: ${items} | LOC: ${userLocationURL}`); // DETAILS
+
+        document.getElementById('submit-btn').innerText = "Sending...";
+        
+        try {
+            await fetch(FORM_URL, { method: "POST", mode: "no-cors", body: formData });
+            alert("Order Placed Successfully!");
+            location.reload();
+        } catch (e) {
+            alert("Check internet and try again.");
+        }
+    }
+
+    renderTabs();
+    renderItems("Drinks & Breakfast");
+</script>
+</body>
+</html>
